@@ -15,6 +15,8 @@
 		E0D5D93E2BDF90D900B4FF48 /* rumah.scn in Resources */ = {isa = PBXBuildFile; fileRef = E0D5D93D2BDF90D900B4FF48 /* rumah.scn */; };
 		E0D5D9422BDF91BC00B4FF48 /* jam2.usdc in Resources */ = {isa = PBXBuildFile; fileRef = E0D5D9412BDF91BC00B4FF48 /* jam2.usdc */; };
 		E0D5D9442BDF96A200B4FF48 /* jamMuterJalan.usda in Resources */ = {isa = PBXBuildFile; fileRef = E0D5D9432BDF96A200B4FF48 /* jamMuterJalan.usda */; };
+		E0DA7EED2BE10DB00055E513 /* untitled.usdc in Resources */ = {isa = PBXBuildFile; fileRef = E0DA7EEC2BE10DB00055E513 /* untitled.usdc */; };
+		E0DA7EEF2BE10DC10055E513 /* Walking-Home-chosic.com_.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E0DA7EEE2BE10DC10055E513 /* Walking-Home-chosic.com_.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +29,8 @@
 		E0D5D93D2BDF90D900B4FF48 /* rumah.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = rumah.scn; sourceTree = "<group>"; };
 		E0D5D9412BDF91BC00B4FF48 /* jam2.usdc */ = {isa = PBXFileReference; lastKnownFileType = file; path = jam2.usdc; sourceTree = "<group>"; };
 		E0D5D9432BDF96A200B4FF48 /* jamMuterJalan.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jamMuterJalan.usda; sourceTree = "<group>"; };
+		E0DA7EEC2BE10DB00055E513 /* untitled.usdc */ = {isa = PBXFileReference; lastKnownFileType = file; name = untitled.usdc; path = "Blender Asset/untitled.usdc"; sourceTree = "<group>"; };
+		E0DA7EEE2BE10DC10055E513 /* Walking-Home-chosic.com_.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Walking-Home-chosic.com_.mp3"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +69,9 @@
 				E0D5D93D2BDF90D900B4FF48 /* rumah.scn */,
 				E0D5D9432BDF96A200B4FF48 /* jamMuterJalan.usda */,
 				E0D5D9412BDF91BC00B4FF48 /* jam2.usdc */,
+				E0DA7EEC2BE10DB00055E513 /* untitled.usdc */,
 				E0D5D9392BDF7B9500B4FF48 /* room.usdc */,
+				E0DA7EEE2BE10DC10055E513 /* Walking-Home-chosic.com_.mp3 */,
 				E0D5D9192BDE7B2100B4FF48 /* Preview Content */,
 			);
 			path = "Life(Non-AR)";
@@ -142,7 +148,9 @@
 				E0D5D9442BDF96A200B4FF48 /* jamMuterJalan.usda in Resources */,
 				E0D5D91B2BDE7B2100B4FF48 /* Preview Assets.xcassets in Resources */,
 				E0D5D9182BDE7B2100B4FF48 /* Assets.xcassets in Resources */,
+				E0DA7EED2BE10DB00055E513 /* untitled.usdc in Resources */,
 				E0D5D93A2BDF7B9500B4FF48 /* room.usdc in Resources */,
+				E0DA7EEF2BE10DC10055E513 /* Walking-Home-chosic.com_.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

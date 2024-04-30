@@ -1,3 +1,4 @@
+
 import SwiftUI
 import SceneKit
 
@@ -17,7 +18,7 @@ struct SceneViewContainer: UIViewRepresentable {
         let sceneView = SCNView()
 
         // Load the "room.usdc" scene
-        if let scene = SCNScene(named: "jamMuterJalan.usda") {
+        if let scene = SCNScene(named: "untitled.usdc") {
             sceneView.scene = scene
         }
 
@@ -93,26 +94,94 @@ private struct GameScreen: View {
     @Binding var gameState: GameState
 
     var body: some View {
-        let scaleFactor: CGFloat = 2.5
-        
+        let sceneScaleFactor: CGFloat = 2
 
-        return ZStack {
+        return ZStack{
+            
+            //background color
+//            Color(.red)
+//                .ignoresSafeArea()
+            
             switch gameState {
             case .initial:
-                SceneViewContainer(color: nil, rotationAngle: 0, swivelCubeAction: { _ in })
-                    .edgesIgnoringSafeArea(.all)
+                VStack {
+                    Text("Chances").font(.title)
+                    Spacer()
+                    SceneViewContainer(color: nil, rotationAngle: 0, swivelCubeAction: { _ in })
+                        .scaledToFit()
+                        .scaleEffect(sceneScaleFactor)
+                        .edgesIgnoringSafeArea(.all)
+//                        .foregroundStyle(.red) //background color
+                    Spacer()
+                    Button(action: {
+                        self.gameState = .blueCube
+                    }) {
+                        Text("Continue")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.bottom, 20)
+                }
             case .blueCube:
-                SceneViewContainer(color: .blue, rotationAngle: 0, swivelCubeAction: { _ in })
-                    .edgesIgnoringSafeArea(.all)
+                VStack {
+                 Spacer()
+                    SceneViewContainer(color: .yellow, rotationAngle: 0, swivelCubeAction: { _ in })
+                        .scaledToFit()
+                        .scaleEffect(sceneScaleFactor)
+                        .edgesIgnoringSafeArea(.all)
+                    Spacer()
+                    Button(action: {
+                        self.gameState = .purpleCube
+                    }) {
+                        Text("Work")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.bottom, 20)
+                }
+                
             case .purpleCube:
-                SceneViewContainer(color: .purple, rotationAngle: 0, swivelCubeAction: { _ in })
-                    .edgesIgnoringSafeArea(.all)
+                VStack {
+                 Spacer()
+                    SceneViewContainer(color: .yellow, rotationAngle: 0, swivelCubeAction: { _ in })
+                        .scaledToFit()
+                        .scaleEffect(sceneScaleFactor)
+                        .edgesIgnoringSafeArea(.all)
+                    Spacer()
+                    Button(action: {
+                        self.gameState = .quitGame
+                    }) {
+                        Text("End Life")
+                            .padding()
+                            .background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .cornerRadius(10)
+                    }
+                    .padding(.bottom, 20)
+                }
+
+                
+
+//            case .blueCube:
+//                SceneViewContainer(color: .blue, rotationAngle: 0, swivelCubeAction: { _ in })
+//                    .edgesIgnoringSafeArea(.all)
+//                    .scaledToFit()
+            
+//            case .purpleCube:
+//                SceneViewContainer(color: .purple, rotationAngle: 0, swivelCubeAction: { _ in })
+//                    .edgesIgnoringSafeArea(.all)
+//                    .scaledToFit()
+                
             case .quitGame:
                 QuitGameOverlay()
                     .edgesIgnoringSafeArea(.all)
+                    .scaledToFit()
             }
         }
-        .scaleEffect(scaleFactor)
     }
 }
 
@@ -124,7 +193,7 @@ private struct QuitGameOverlay: View {
             Button(action: {
                 exit(0)
             }) {
-                Text("Quit Game")
+                Text("No Retry, One Life, One Chance.")
                     .padding()
                     .background(Color.red)
                     .foregroundColor(Color.white)
@@ -140,18 +209,6 @@ struct ContentView: View {
 
     var body: some View {
         GameScreen(gameState: $gameState)
-            .onTapGesture {
-                switch gameState {
-                case .initial:
-                    gameState = .blueCube
-                case .blueCube:
-                    gameState = .purpleCube
-                case .purpleCube:
-                    gameState = .quitGame
-                case .quitGame:
-                    break // Do nothing
-                }
-            }
     }
 }
 
@@ -164,3 +221,4 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
