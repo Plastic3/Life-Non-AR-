@@ -1,0 +1,30 @@
+#usda 1.0
+(
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    def "jam2" (
+        active = true
+        prepend references = @jam2.usdc@
+    )
+    {
+        quatf xformOp:orient = (1, 0, 0, 0)
+        float3 xformOp:scale = (0.13934231, 0.13934231, 0.13934231)
+        float3 xformOp:translate = (0.9381871, 0.6906816, 0.03877516)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+
+    def "room" (
+        active = true
+        prepend references = @room.usdc@
+    )
+    {
+        float3 xformOp:scale = (1, 1, 1)
+        float3 xformOp:translate = (0, -5.9604645e-8, 0)
+    }
+}
+
