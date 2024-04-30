@@ -1,8 +1,9 @@
-
 import SwiftUI
 import SceneKit
+import AVFoundation
+import Combine
 
-enum GameState {
+enum GameState: String {
     case initial
     case blueCube
     case purpleCube
@@ -40,8 +41,8 @@ struct SceneViewContainer: UIViewRepresentable {
         sceneView.scene?.rootNode.runAction(rotation)
 
         // Add a pan gesture recognizer to swivel the camera
-//        let panGesture = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePan(_:)))
-//        sceneView.addGestureRecognizer(panGesture)
+        // let panGesture = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePan(_:)))
+        // sceneView.addGestureRecognizer(panGesture)
 
         // Set up the coordinator for gesture handling
         objc_setAssociatedObject(sceneView, &AssociatedKeys.coordinator, context.coordinator, .OBJC_ASSOCIATION_RETAIN)
@@ -92,16 +93,12 @@ struct SceneViewContainer: UIViewRepresentable {
 
 private struct GameScreen: View {
     @Binding var gameState: GameState
+    @State private var transitionComplete = false
 
     var body: some View {
         let sceneScaleFactor: CGFloat = 2
 
         return ZStack{
-            
-            //background color
-//            Color(.red)
-//                .ignoresSafeArea()
-            
             switch gameState {
             case .initial:
                 VStack {
@@ -111,10 +108,11 @@ private struct GameScreen: View {
                         .scaledToFit()
                         .scaleEffect(sceneScaleFactor)
                         .edgesIgnoringSafeArea(.all)
-//                        .foregroundStyle(.red) //background color
                     Spacer()
                     Button(action: {
-                        self.gameState = .blueCube
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                            self.gameState = .blueCube
+                        }
                     }) {
                         Text("Continue")
                             .padding()
@@ -126,14 +124,16 @@ private struct GameScreen: View {
                 }
             case .blueCube:
                 VStack {
-                 Spacer()
+                    Spacer()
                     SceneViewContainer(color: .yellow, rotationAngle: 0, swivelCubeAction: { _ in })
                         .scaledToFit()
                         .scaleEffect(sceneScaleFactor)
                         .edgesIgnoringSafeArea(.all)
                     Spacer()
                     Button(action: {
-                        self.gameState = .purpleCube
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                            self.gameState = .purpleCube
+                        }
                     }) {
                         Text("Work")
                             .padding()
@@ -146,14 +146,16 @@ private struct GameScreen: View {
                 
             case .purpleCube:
                 VStack {
-                 Spacer()
+                    Spacer()
                     SceneViewContainer(color: .yellow, rotationAngle: 0, swivelCubeAction: { _ in })
                         .scaledToFit()
                         .scaleEffect(sceneScaleFactor)
                         .edgesIgnoringSafeArea(.all)
                     Spacer()
                     Button(action: {
-                        self.gameState = .quitGame
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                            self.gameState = .quitGame
+                        }
                     }) {
                         Text("End Life")
                             .padding()
@@ -163,18 +165,6 @@ private struct GameScreen: View {
                     }
                     .padding(.bottom, 20)
                 }
-
-                
-
-//            case .blueCube:
-//                SceneViewContainer(color: .blue, rotationAngle: 0, swivelCubeAction: { _ in })
-//                    .edgesIgnoringSafeArea(.all)
-//                    .scaledToFit()
-            
-//            case .purpleCube:
-//                SceneViewContainer(color: .purple, rotationAngle: 0, swivelCubeAction: { _ in })
-//                    .edgesIgnoringSafeArea(.all)
-//                    .scaledToFit()
                 
             case .quitGame:
                 QuitGameOverlay()
@@ -205,10 +195,32 @@ private struct QuitGameOverlay: View {
 }
 
 struct ContentView: View {
-    @State private var gameState: GameState = .initial
+    @State private var gameState: GameState
+    private var audioPlayer: AVAudioPlayer?
+
+    init() {
+        let storedState = UserDefaults.standard.string(forKey: "gameState") ?? GameState.initial.rawValue
+        self._gameState = State(initialValue: GameState(rawValue: storedState) ?? .initial)
+
+        // Load background music
+        if let path = Bundle.main.path(forResource: "Walking-Home-chosic", ofType: "mp3") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: path))
+                audioPlayer?.numberOfLoops = -1 // Loop indefinitely
+                audioPlayer?.play()
+            } catch {
+                // Handle error
+                print("Error loading background music: \(error)")
+            }
+        }
+    }
 
     var body: some View {
         GameScreen(gameState: $gameState)
+            .onDisappear {
+                // Stop music when the view disappears
+                audioPlayer?.stop()
+            }
     }
 }
 
@@ -221,4 +233,3 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
-
