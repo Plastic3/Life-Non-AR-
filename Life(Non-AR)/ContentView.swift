@@ -1,13 +1,12 @@
 import SwiftUI
 import SceneKit
 import AVFoundation
-import Combine
 
-enum GameState: String {
-    case initial
-    case blueCube
-    case purpleCube
-    case quitGame
+enum GameState: Int {
+    case initial = 0
+    case blueCube = 1
+    case purpleCube = 2
+    case quitGame = 3
 }
 
 struct SceneViewContainer: UIViewRepresentable {
@@ -40,13 +39,6 @@ struct SceneViewContainer: UIViewRepresentable {
         let rotation = SCNAction.rotateTo(x: 0, y: rotationAngle, z: 0, duration: 0) // Set duration to 0
         sceneView.scene?.rootNode.runAction(rotation)
 
-        // Add a pan gesture recognizer to swivel the camera
-        // let panGesture = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePan(_:)))
-        // sceneView.addGestureRecognizer(panGesture)
-
-        // Set up the coordinator for gesture handling
-        objc_setAssociatedObject(sceneView, &AssociatedKeys.coordinator, context.coordinator, .OBJC_ASSOCIATION_RETAIN)
-
         // Set the color of the diorama if provided
         if let color = color {
             setColor(of: sceneView.scene?.rootNode, to: color)
@@ -57,27 +49,6 @@ struct SceneViewContainer: UIViewRepresentable {
 
     func updateUIView(_ uiView: SCNView, context: Context) {
         // Update the view if needed
-    }
-
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(swivelCubeAction: swivelCubeAction)
-    }
-
-    class Coordinator: NSObject {
-        var swivelCubeAction: (CGFloat) -> Void
-
-        init(swivelCubeAction: @escaping (CGFloat) -> Void) {
-            self.swivelCubeAction = swivelCubeAction
-        }
-
-        @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
-            let translation = gesture.translation(in: gesture.view).x
-            if let view = gesture.view as? SCNView,
-               let sceneView = view.scene?.rootNode {
-                sceneView.eulerAngles.y += Float(translation) * 0.01
-            }
-            gesture.setTranslation(.zero, in: gesture.view)
-        }
     }
 
     private func setColor(of node: SCNNode?, to color: UIColor) {
@@ -93,7 +64,14 @@ struct SceneViewContainer: UIViewRepresentable {
 
 private struct GameScreen: View {
     @Binding var gameState: GameState
+    @State private var buttonTextIndexInitial = 0
+    @State private var buttonTextIndexBlueCube = 0
+    @State private var buttonTextIndexPurpleCube = 0
+    @State private var buttonTextsInitial = ["Start?", "Keep tapping", "Maybe tap faster?", "Harder?", "Now you missed it right?"] // Array of texts for initial state
+    @State private var buttonTextsBlueCube = ["Stop trying", "This time work for living", "Or try other things?", "Run away from the rabbit hole"] // Array of texts for blueCube state
+    @State private var buttonTextsPurpleCube = ["Well it's done", "Finished!", "You want to try something else?", "Did we hid something in the game?", "Try it again?", "Maybe your choice will make the game different!"] // Array of texts for purpleCube state
     @State private var transitionComplete = false
+    @AppStorage("lastViewPage") var pageIndex: Int = 0
 
     var body: some View {
         let sceneScaleFactor: CGFloat = 2
@@ -110,11 +88,14 @@ private struct GameScreen: View {
                         .edgesIgnoringSafeArea(.all)
                     Spacer()
                     Button(action: {
+                        // Cycle through texts in buttonTextsInitial array
+                        self.buttonTextIndexInitial = (self.buttonTextIndexInitial + 1) % self.buttonTextsInitial.count
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                             self.gameState = .blueCube
                         }
                     }) {
-                        Text("Continue")
+                        Text(buttonTextsInitial[buttonTextIndexInitial]) // Use buttonTextIndexInitial to get current text
                             .padding()
                             .background(Color.blue)
                             .foregroundColor(Color.white)
@@ -131,11 +112,14 @@ private struct GameScreen: View {
                         .edgesIgnoringSafeArea(.all)
                     Spacer()
                     Button(action: {
+                        // Cycle through texts in buttonTextsBlueCube array
+                        self.buttonTextIndexBlueCube = (self.buttonTextIndexBlueCube + 1) % self.buttonTextsBlueCube.count
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
                             self.gameState = .purpleCube
                         }
                     }) {
-                        Text("Work")
+                        Text(buttonTextsBlueCube[buttonTextIndexBlueCube]) // Use buttonTextIndexBlueCube to get current text
                             .padding()
                             .background(Color.blue)
                             .foregroundColor(Color.white)
@@ -143,7 +127,7 @@ private struct GameScreen: View {
                     }
                     .padding(.bottom, 20)
                 }
-                
+
             case .purpleCube:
                 VStack {
                     Spacer()
@@ -153,11 +137,16 @@ private struct GameScreen: View {
                         .edgesIgnoringSafeArea(.all)
                     Spacer()
                     Button(action: {
+                        // Cycle through texts in buttonTextsPurpleCube array
+                        self.buttonTextIndexPurpleCube = (self.buttonTextIndexPurpleCube + 1) % self.buttonTextsPurpleCube.count
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                            pageIndex = GameState.quitGame.rawValue
+                            
                             self.gameState = .quitGame
                         }
                     }) {
-                        Text("End Life")
+                        Text(buttonTextsPurpleCube[buttonTextIndexPurpleCube]) // Use buttonTextIndexPurpleCube to get current text
                             .padding()
                             .background(Color.blue)
                             .foregroundColor(Color.white)
@@ -165,11 +154,27 @@ private struct GameScreen: View {
                     }
                     .padding(.bottom, 20)
                 }
-                
+
             case .quitGame:
                 QuitGameOverlay()
                     .edgesIgnoringSafeArea(.all)
                     .scaledToFit()
+            }
+            
+            // Restart button
+            VStack {
+                Spacer()
+                Button(action: {
+                    // Reset game to initial state
+                    self.gameState = .initial
+                }) {
+                    Text("Restart Game")
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(Color.white)
+                        .cornerRadius(10)
+                }
+                Spacer()
             }
         }
     }
@@ -183,7 +188,7 @@ private struct QuitGameOverlay: View {
             Button(action: {
                 exit(0)
             }) {
-                Text("No Retry, One Life, One Chance.")
+                Text("No Retry, One Life, One Chance. Make it work.")
                     .padding()
                     .background(Color.red)
                     .foregroundColor(Color.white)
@@ -196,10 +201,13 @@ private struct QuitGameOverlay: View {
 
 struct ContentView: View {
     @State private var gameState: GameState
+    @State private var isMuted = false
+    @AppStorage("lastViewPage") var pageIndex: Int = 0
+    
     private var audioPlayer: AVAudioPlayer?
 
     init() {
-        let storedState = UserDefaults.standard.string(forKey: "gameState") ?? GameState.initial.rawValue
+        let storedState = UserDefaults.standard.integer(forKey: "lastViewPage") ?? GameState.initial.rawValue
         self._gameState = State(initialValue: GameState(rawValue: storedState) ?? .initial)
 
         // Load background music
@@ -216,16 +224,28 @@ struct ContentView: View {
     }
 
     var body: some View {
-        GameScreen(gameState: $gameState)
-            .onDisappear {
-                // Stop music when the view disappears
-                audioPlayer?.stop()
+        VStack {
+            GameScreen(gameState: $gameState)
+                .onDisappear {
+                    // Stop music when the view disappears
+                    audioPlayer?.stop()
+                }
+            
+            // Mute Button
+            Button(action: {
+                isMuted.toggle()
+                if isMuted {
+                    audioPlayer?.pause()
+                } else {
+                    audioPlayer?.play()
+                }
+            }) {
+                Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.fill")
+                    .foregroundColor(isMuted ? .red : .green)
             }
+            .padding()
+        }
     }
-}
-
-private struct AssociatedKeys {
-    static var coordinator = "coordinator"
 }
 
 struct ContentView_Previews: PreviewProvider {
